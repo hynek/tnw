@@ -53,7 +53,7 @@ class TLSATests(SynchronousTestCase):
             generalResult=createResults(status=getdns.GETDNS_RESPSTATUS_GOOD,
                                         selector=0,
                                         certificate_association_data=CERT_FULL))
-        res = _dane.tlsa('example.com', 443, 'tcp', getdns=fakeGetdns)
+        res = _dane.lookup_tlsa_records('example.com', 443, 'tcp', getdns=fakeGetdns)
         self.assertEqual(
             (0, crypto.X509),
             (res.type, type(res.cert))
@@ -72,7 +72,7 @@ class TLSATests(SynchronousTestCase):
                                         certificate_association_data=expected))
         self.assertEqual(
             binascii.hexlify(expected),
-            _dane.tlsa('example.com', 443, 'tcp', getdns=fakeGetdns).spki
+            _dane.lookup_tlsa_records('example.com', 443, 'tcp', getdns=fakeGetdns).spki
         )
 
 
@@ -81,8 +81,8 @@ class TLSATests(SynchronousTestCase):
         L{_dane.tlsa} raises LookupError if the domain name does not exist.
         """
         e = self.assertRaises(
-            _dane.LookupError,
-            _dane.tlsa, 'example.com', 443, 'tcp', getdns=FakeGetdns(
+            _dane.GetdnsResponseError,
+            _dane.lookup_tlsa_records, 'example.com', 443, 'tcp', getdns=FakeGetdns(
                 generalResult=createResults(
                     status=getdns.GETDNS_RESPSTATUS_NO_NAME
                 )

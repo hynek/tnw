@@ -25,9 +25,9 @@ def tlsaDomainName(parentDomain, port, proto):
     return "_{}._{}.{}".format(port, proto, parentDomain)
 
 
-class LookupError(FancyStrMixin, Exception):
+class GetdnsResponseError(FancyStrMixin, Exception):
     """
-    Raised for any getdns return status that isn't GOOD.
+    Raised for any getdns response that isn't GOOD.
     """
     showAttributes = ('errorCode', 'errorText')
 
@@ -139,4 +139,4 @@ def lookup_tlsa_records(parentDomain, port, proto, getdns=getdns):
             rdata["matching_type"],
         )
 
-    raise LookupError(results['status'])
+    raise GetdnsResponseError(results['status'])
