@@ -24,5 +24,5 @@ def extractPublicKey(cert):
     buf = ffi.new("unsigned char **")
     length = l.i2d_RSA_PUBKEY(rsa, buf)
     pk = buf[0]
-    ffi.gc(pk, l.free)
+    ffi.gc(pk, l.OpenSSL_free)
     return ffi.buffer(pk, length)[:]
