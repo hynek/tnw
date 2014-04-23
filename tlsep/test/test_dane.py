@@ -1,8 +1,6 @@
 # Copyright (c) Hynek Schlawack, Richard Wall
 # See LICENSE for details.
 
-import binascii
-from OpenSSL import crypto
 from twisted.trial.unittest import SynchronousTestCase
 import getdns
 from tlsep import _dane
@@ -20,13 +18,10 @@ class TLSADomainNameTests(SynchronousTestCase):
         )
 
 
-
 class FakeGetdns(object):
     """
     An in memory fake of the getdns api for testing.
     """
-
-
     def __init__(self, generalResult=None):
         self._generalResult = generalResult
 
@@ -101,7 +96,6 @@ class TLSATests(SynchronousTestCase):
             getdns.GETDNS_RESPSTATUS_NO_NAME,
             e.errorCode
         )
-
 
 
 def createResults(status=getdns.GETDNS_RESPSTATUS_GOOD,
