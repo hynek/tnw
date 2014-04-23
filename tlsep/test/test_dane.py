@@ -175,5 +175,5 @@ class TLSATests(SynchronousTestCase):
         )
         self.assertEqual(
             getdns.GETDNS_RESPSTATUS_NO_NAME,
-            e.args[0]
+            e.errorCode
         )
