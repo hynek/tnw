@@ -111,8 +111,8 @@ def createResults(status=getdns.GETDNS_RESPSTATUS_GOOD,
                                           'name': '_443._tcp.getdnsapi.org.',
                                           'rdata': {
                                               'certificate_association_data': certificate_association_data,
-                                              # 'certificate_usage': 3,
-                                              # 'matching_type': 1,
+                                              'certificate_usage': 3,
+                                              'matching_type': 1,
                                               # 'rdata_raw': "",
                                               'selector': selector
                                           },
