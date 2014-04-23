@@ -13,7 +13,7 @@ def tlsaDomainName(parent_domain, port, proto):
 
 
 
-def tlsa(parent_domain, port, proto):
+def tlsa(parent_domain, port, proto, getdns=getdns):
     ctx = getdns.context_create()
     extensions = {
         "return_both_v4_and_v6" : getdns.GETDNS_EXTENSION_TRUE,
