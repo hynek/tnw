@@ -1,5 +1,5 @@
 # -*- test-case-name: tlsep.test.test_dane -*-
-# Copyright (c) Richard Wall, Hynek Schwlack
+# Copyright (c) Hynek Schlawack, Richard Wall
 # See LICENSE for details.
 
 import hashlib

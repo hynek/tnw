@@ -1,4 +1,6 @@
 # -*- test-case-name: tlsep.test.test_tls -*-
+# Copyright (c) Hynek Schlawack, Richard Wall
+# See LICENSE for details.
 
 from __future__ import absolute_import, division, print_function
 

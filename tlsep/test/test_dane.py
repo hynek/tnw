@@ -1,3 +1,6 @@
+# Copyright (c) Hynek Schlawack, Richard Wall
+# See LICENSE for details.
+
 import binascii
 from OpenSSL import crypto
 from twisted.trial.unittest import SynchronousTestCase
