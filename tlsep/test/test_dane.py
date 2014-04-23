@@ -30,6 +30,53 @@ class GetdnsResponseErrorTests(SynchronousTestCase):
         )
 
 
+class TLSARecordTests(SynchronousTestCase):
+    def test_unmappedSelector(self):
+        self.patch(_dane, "SELECTOR_MAP", {})
+        e = self.assertRaises(
+            ValueError,
+            _dane.TLSARecord,
+            payload=b'',
+            usage=0,
+            selector=_dane.SELECTOR.CERT.value,
+            matchingType=_dane.MATCHING_TYPE.FULL.value
+        )
+        self.assertEqual(
+            'Invalid selector: {}'.format(_dane.SELECTOR.CERT.value,),
+            e.args[0]
+        )
+
+
+    def test_unmappedMatchingType(self):
+        self.patch(_dane, "MATCHING_TYPE_MAP", {})
+        e = self.assertRaises(
+            ValueError,
+            _dane.TLSARecord,
+            payload=b'',
+            usage=0,
+            selector=_dane.SELECTOR.CERT.value,
+            matchingType=_dane.MATCHING_TYPE.FULL.value
+        )
+        self.assertEqual(
+            'Invalid matching type: {}'.format(_dane.MATCHING_TYPE.FULL.value,),
+            e.args[0]
+        )
+
+
+    def test_matchesCertificate(self):
+        """
+        """
+        self.assertEqual(
+            "",
+            _dane.TLSARecord(
+                payload=b'',
+                usage=0,
+                selector=_dane.SELECTOR.CERT.value,
+                matchingType=_dane.MATCHING_TYPE.FULL.value
+            ).matchesCertificate()
+        )
+
+
 class FakeGetdns(object):
     """
     An in memory fake of the getdns api for testing.
