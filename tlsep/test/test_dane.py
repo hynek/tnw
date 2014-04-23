@@ -16,7 +16,8 @@ class TLSADomainNameTests(SynchronousTestCase):
 
 
 def createResults(status=getdns.GETDNS_RESPSTATUS_GOOD,
-                  certificate_association_data=b""):
+                  selector=None,
+                  certificate_association_data=b"",):
     return {'answer_type': 800,
             'canonical_name': '_443._tcp.getdnsapi.org.',
             'just_address_answers': [],
@@ -28,7 +29,7 @@ def createResults(status=getdns.GETDNS_RESPSTATUS_GOOD,
                                               # 'certificate_usage': 3,
                                               # 'matching_type': 1,
                                               # 'rdata_raw': "",
-                                              # 'selector': 1
+                                              'selector': selector
                                           },
                                           # 'ttl': 450,
                                           # 'type': 52},
@@ -131,19 +132,36 @@ class FakeGetdns(object):
         return self._generalResult
 
 
-
-
-
 class TLSATests(SynchronousTestCase):
-    def test_tlsaGood(self):
+    def test_tlsaCert(self):
         """
-        L{dane.tlsa} returns a hex encoded signature if the domain name exists and a
-        verfied record is found.
+        L{dane.tlsa} returns a TLSACert instance if the domain name exists and a
+        verfied record is found and the record selector type is CERT.
         """
         expected = b'FOOBAR'
+        fakeGetdns = FakeGetdns(
+            generalResult=createResults(status=getdns.GETDNS_RESPSTATUS_GOOD,
+                                        selector=0,
+                                        certificate_association_data=expected))
+        self.assertEqual(
+            b'',
+            dane.tlsa('example.com', 443, 'tcp', getdns=fakeGetdns).cert
+        )
+
+
+    def test_tlsaSPKI(self):
+        """
+        L{dane.tlsa} returns a TLSASPKI instance if the domain name exists and a
+        verfied record is found and the record selector type is SPKI.
+        """
+        expected = b'FOOBAR'
+        fakeGetdns = FakeGetdns(
+            generalResult=createResults(status=getdns.GETDNS_RESPSTATUS_GOOD,
+                                        selector=1,
+                                        certificate_association_data=expected))
         self.assertEqual(
             binascii.hexlify(expected),
-            dane.tlsa('example.com', 443, 'tcp', getdns=FakeGetdns(generalResult=createResults(certificate_association_data=expected)))
+            dane.tlsa('example.com', 443, 'tcp', getdns=fakeGetdns).spki
         )
 
 

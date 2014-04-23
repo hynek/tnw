@@ -5,6 +5,8 @@ import binascii
 import getdns
 
 
+from twisted.python.util import FancyStrMixin
+
 def tlsaDomainName(parentDomain, port, proto):
     """
     Return a TLSA domain name.
@@ -23,12 +25,28 @@ class LookupError(Exception):
     pass
 
 
-class TLSAFullCertificate(object):
-    pass
+class TLSA_Cert(FancyStrMixin, object):
+    type = 0
+    def __init__(self, cert):
+        """
+        """
+        self.cert = cert
 
 
-class TLSASubjectPublicInfo(object):
-    pass
+class TLSA_SPKI(FancyStrMixin, object):
+    type = 1
+
+    showAttributes = ('spki',)
+
+    def __init__(self, spki):
+        """
+        """
+        self.spki = binascii.hexlify(spki)
+
+
+TLSA_SELECTOR_MAP = {}
+for t in (TLSA_Cert, TLSA_SPKI):
+    TLSA_SELECTOR_MAP[t.type] = t
 
 
 def tlsa(parentDomain, port, proto, getdns=getdns):
@@ -57,6 +75,7 @@ def tlsa(parentDomain, port, proto, getdns=getdns):
                              extensions=extensions)
 
     if results["status"] == getdns.GETDNS_RESPSTATUS_GOOD:
-        return binascii.hexlify(results['replies_tree'][0]['answer'][0]['rdata']['certificate_association_data'])
+        tlsaType = TLSA_SELECTOR_MAP[results['replies_tree'][0]['answer'][0]['rdata']['selector']]
+        return tlsaType(results['replies_tree'][0]['answer'][0]['rdata']['certificate_association_data'])
 
     raise LookupError(results['status'])
