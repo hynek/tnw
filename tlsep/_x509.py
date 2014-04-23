@@ -25,6 +25,6 @@ def extractPublicKey(cert):
     rsa = l.EVP_PKEY_get1_RSA(pk._pkey)
     buf = ffi.new("unsigned char **")
     length = l.i2d_RSA_PUBKEY(rsa, buf)
-    pk = buf[0]
-    ffi.gc(pk, l.OpenSSL_free)
-    return ffi.buffer(pk, length)[:]
+    pk = ffi.buffer(buf[0], length)[:]
+    ffi.gc(buf[0], l.OPENSSL_free)
+    return pk
