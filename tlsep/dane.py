@@ -1,8 +1,8 @@
 # -*- test-case-name: tlsep.test.test_dane -*-
 # Copyright (c) Richard Wall, Hynek Schwlack
 # See LICENSE for details.
-
-import getdns, pprint, sys
+import binascii
+import getdns
 
 
 def tlsaDomainName(parent_domain, port, proto):
@@ -10,6 +10,11 @@ def tlsaDomainName(parent_domain, port, proto):
     Return a TLSA domain name.
     """
     return "_%s._%s.%s" % (port, proto, parent_domain)
+
+
+
+class LookupError(Exception):
+    pass
 
 
 
@@ -25,12 +30,6 @@ def tlsa(parent_domain, port, proto, getdns=getdns):
                              extensions=extensions)
 
     if results["status"] == getdns.GETDNS_RESPSTATUS_GOOD:
-        sys.stdout.write("Addresses: ")
+        return binascii.hexlify(results['replies_tree'][0]['answer'][0]['rdata']['certificate_association_data'])
 
-        for addr in results["just_address_answers"]:
-            print " {0}".format(addr["IPSTRING"])
-        sys.stdout.write("\n\n")
-        print "Entire results tree: "
-        pprint.pprint(results)
-    if results["status"] == getdns.GETDNS_RESPSTATUS_NO_NAME:
-        print "{0} not found".format(sys.argv[1])
+    raise LookupError(results['status'])
