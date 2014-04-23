@@ -18,15 +18,15 @@ def tlsaDomainName(parentDomain, port, proto):
     @param port: The port number with which the TLSA record is associated.
     @param proto: The IP protocol with which the TLSA record is associated.
     """
-    return "_%s._%s.%s" % (port, proto, parentDomain)
+    return "_{}._{}.{}".format(port, proto, parentDomain)
 
 
 class LookupError(FancyStrMixin, Exception):
     """
     Raised for any getdns return status that isn't GOOD.
     """
-
     showAttributes = ('errorCode', 'errorText')
+
     def __init__(self, errorCode):
         self.errorCode = errorCode
 
@@ -42,6 +42,7 @@ class LookupError(FancyStrMixin, Exception):
 
 class TLSA_Cert(FancyStrMixin, object):
     type = 0
+
     def __init__(self, cert):
         """
         """
@@ -81,8 +82,8 @@ def tlsa(parentDomain, port, proto, getdns=getdns):
     """
     ctx = getdns.context_create()
     extensions = {
-        "return_both_v4_and_v6" : getdns.GETDNS_EXTENSION_TRUE,
-        "dnssec_return_only_secure" : getdns.GETDNS_EXTENSION_TRUE
+        "return_both_v4_and_v6": getdns.GETDNS_EXTENSION_TRUE,
+        "dnssec_return_only_secure": getdns.GETDNS_EXTENSION_TRUE
     }
     results = getdns.general(ctx,
                              request_type=getdns.GETDNS_RRTYPE_TLSA,
@@ -90,7 +91,13 @@ def tlsa(parentDomain, port, proto, getdns=getdns):
                              extensions=extensions)
 
     if results["status"] == getdns.GETDNS_RESPSTATUS_GOOD:
-        tlsaType = TLSA_SELECTOR_MAP[results['replies_tree'][0]['answer'][0]['rdata']['selector']]
-        return tlsaType(results['replies_tree'][0]['answer'][0]['rdata']['certificate_association_data'])
+        tlsaType = (
+            TLSA_SELECTOR_MAP[results['replies_tree']
+                              [0]['answer'][0]['rdata']['selector']]
+        )
+        return tlsaType(
+            results['replies_tree']
+            [0]['answer'][0]['rdata']['certificate_association_data']
+        )
 
     raise LookupError(results['status'])
