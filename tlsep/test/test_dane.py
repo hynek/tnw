@@ -18,6 +18,18 @@ class TLSADomainNameTests(SynchronousTestCase):
         )
 
 
+class GetdnsResponseErrorTests(SynchronousTestCase):
+    def test_errorText(self):
+        """
+        L{_dane.GetdnsResponseError} has an C{errorText} attribute which is the name
+        of the corresponding L{getdns} constant.
+        """
+        self.assertEqual(
+            "GETDNS_RESPSTATUS_NO_NAME",
+            _dane.GetdnsResponseError(getdns.GETDNS_RESPSTATUS_NO_NAME).errorText
+        )
+
+
 class FakeGetdns(object):
     """
     An in memory fake of the getdns api for testing.
