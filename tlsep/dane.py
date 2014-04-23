@@ -18,11 +18,23 @@ def tlsaDomainName(parentDomain, port, proto):
     return "_%s._%s.%s" % (port, proto, parentDomain)
 
 
-class LookupError(Exception):
+class LookupError(FancyStrMixin, Exception):
     """
     Raised for any getdns return status that isn't GOOD.
     """
-    pass
+
+    showAttributes = ('errorCode', 'errorText')
+    def __init__(self, errorCode):
+        self.errorCode = errorCode
+
+
+    @property
+    def errorText(self):
+        for k, v in getdns.__dict__.items():
+            if k.startswith('GETDNS_RESPSTATUS_'):
+                if getattr(getdns, k) == self.errorCode:
+                    return k
+
 
 
 class TLSA_Cert(FancyStrMixin, object):
