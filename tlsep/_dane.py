@@ -105,7 +105,7 @@ class TLSARecord(FancyStrMixin, object):
 
 
 
-def tlsa(parentDomain, port, proto, getdns=getdns):
+def lookup_tlsa_records(parentDomain, port, proto, getdns=getdns):
     """
     Lookup a TLSA record and return a TLSA type depending on the TLSA
     selector type in the record.
