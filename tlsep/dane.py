@@ -5,7 +5,10 @@ import binascii
 import getdns
 
 
+from OpenSSL import crypto
+
 from twisted.python.util import FancyStrMixin
+
 
 def tlsaDomainName(parentDomain, port, proto):
     """
@@ -42,7 +45,7 @@ class TLSA_Cert(FancyStrMixin, object):
     def __init__(self, cert):
         """
         """
-        self.cert = cert
+        self.cert = crypto.load_certificate(crypto.FILETYPE_ASN1, cert[:])
 
 
 class TLSA_SPKI(FancyStrMixin, object):
