@@ -15,6 +15,6 @@ def main():
         sys.exit(1)
 
     def _main(reactor):
-        return threads.deferToThread(dane.address, sys.argv[1])
+        return threads.deferToThread(dane.dnssec, sys.argv[1])
 
     task.react(_main)
