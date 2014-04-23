@@ -16,7 +16,8 @@ setup(
         'tlsep',
     ],
     install_requires=[
+        'getdns',
+        'idna',
         'twisted',
-        'getdns'
     ],
 )
