@@ -4,9 +4,21 @@
 
 import getdns, pprint, sys
 
-def address(hostname):
+
+def tlsaDomainName(parent_domain, port, proto):
+    """
+    Return a TLSA domain name.
+    """
+    return "_%s._%s.%s" % (port, proto, parent_domain)
+
+
+
+def tlsa(hostname, port, proto):
     ctx = getdns.context_create()
-    extensions = { "return_both_v4_and_v6" : getdns.GETDNS_EXTENSION_TRUE }
+    extensions = {
+        "return_both_v4_and_v6" : getdns.GETDNS_EXTENSION_TRUE,
+        "dnssec_return_only_secure" : getdns.GETDNS_EXTENSION_TRUE
+    }
     results = getdns.address(ctx, name=hostname, extensions=extensions)
     if results["status"] == getdns.GETDNS_RESPSTATUS_GOOD:
         sys.stdout.write("Addresses: ")
