@@ -9,8 +9,7 @@ from twisted.internet import task, threads
 from tlsep import dane
 
 
-
-def verify_main():
+def main():
     if len(sys.argv) != 2:
         print "Usage: {0} hostname".format(sys.argv[0])
         sys.exit(1)
