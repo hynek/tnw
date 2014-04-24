@@ -158,7 +158,7 @@ class TLSATests(SynchronousTestCase):
                                         selector=_dane.SELECTOR.CERT.value,
                                         certificate_association_data=b'FOOBAR'))
         res = _dane.lookup_tlsa_records(
-            'example.com', 443, 'tcp', getdns=fakeGetdns)
+            'example.com', 443, 'tcp', getdns=fakeGetdns)[0]
         self.assertEqual(
             (_dane.SELECTOR.CERT, b'FOOBAR'),
             (res.selector, res.payload)
@@ -176,7 +176,7 @@ class TLSATests(SynchronousTestCase):
                                         selector=_dane.SELECTOR.SPKI.value,
                                         certificate_association_data=b'FOOBAR'))
         res = _dane.lookup_tlsa_records(
-            'example.com', 443, 'tcp', getdns=fakeGetdns)
+            'example.com', 443, 'tcp', getdns=fakeGetdns)[0]
         self.assertEqual(
             (_dane.SELECTOR.SPKI, b'FOOBAR'),
             (res.selector, res.payload)
@@ -220,7 +220,7 @@ def createResults(status=getdns.GETDNS_RESPSTATUS_GOOD,
                                               'selector': selector
                                           },
                                           # 'ttl': 450,
-                                          # 'type': 52},
+                                          'type': 52,
                                          # {'class': 1,
                                          #  'name': '_443._tcp.getdnsapi.org.',
                                          #  'rdata': {'algorithm': 7,
