@@ -26,13 +26,6 @@ def tlsaDomainName(parentDomain, port, proto):
     return "_{}._{}.{}".format(port, proto, parentDomain)
 
 
-class InvalidTLSARecord(FancyStrMixin, object):
-    showAttributes = ("error",)
-
-    def __init__(self, error):
-        self.error = error
-
-
 class GetdnsResponseError(FancyStrMixin, Exception):
     """
     Raised for any getdns response that isn't GOOD.
@@ -56,17 +49,20 @@ class USAGE(Values):
     PKIX_EE = ValueConstant(1)
     DANE_TA = ValueConstant(2)
     DANE_EE = ValueConstant(3)
+    INVALID = ValueConstant(-1)
 
 
 class SELECTOR(Values):
     CERT = ValueConstant(0)
     SPKI = ValueConstant(1)
+    INVALID = ValueConstant(-1)
 
 
 class MATCHING_TYPE(Values):
     FULL = ValueConstant(0)
     SHA_256 = ValueConstant(1)
     SHA_512 = ValueConstant(2)
+    INVALID = ValueConstant(-1)
 
 
 SELECTOR_MAP = {
@@ -85,26 +81,39 @@ MATCHING_TYPE_MAP = {
 
 
 class TLSARecord(FancyStrMixin, object):
-    showAttributes = ('usage', 'selector', 'matchingType')
+    showAttributes = ('usage', 'selector', 'matchingType', 'valid', 'errors')
+    valid = True
 
     def __init__(self, payload, usage, selector, matchingType):
+        self.errors = {}
         self.payload = bytes(payload)
 
         try:
             self.usage = USAGE.lookupByValue(usage)
         except ValueError:
-            raise ValueError("Invalid usage: {}".format(usage))
+            self.usage = USAGE.INVALID
+            self.errors['usage'] = [
+                ("Invalid parameter", usage)
+            ]
+            self.valid = False
         try:
             self.selector = SELECTOR.lookupByValue(selector)
+            self._select = SELECTOR_MAP[self.selector]
         except ValueError:
-            raise ValueError("Invalid selector: {}".format(selector))
+            self.selector = SELECTOR.INVALID
+            self.errors['selector'] = [
+                ("Invalid parameter", selector)
+            ]
+            self.valid = False
         try:
             self.matchingType = MATCHING_TYPE.lookupByValue(matchingType)
+            self._transform = MATCHING_TYPE_MAP[self.matchingType]
         except ValueError:
-            raise ValueError("Invalid matching type: {}".format(matchingType))
-
-        self._select = SELECTOR_MAP[self.selector]
-        self._transform = MATCHING_TYPE_MAP[self.matchingType]
+            self.matchingType = MATCHING_TYPE.INVALID
+            self.errors['matchingType'] = [
+                ("Invalid parameter", matchingType),
+            ]
+        self.valid = self.errors == {}
 
 
     def matchesCertificate(self, cert):
@@ -113,6 +122,8 @@ class TLSARecord(FancyStrMixin, object):
 
         @rtype: bool
         """
+        if not self.valid:
+            raise ValueError("Can't match invalid record.")
         return self.payload == self._transform(self._select(cert))
 
 

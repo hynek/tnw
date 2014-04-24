@@ -29,16 +29,16 @@ class DaneDoctorProtocol(Protocol):
             recs = []
 
             for tlsa in tlsaRecords:
-                if isinstance(tlsa, _dane.InvalidTLSARecord):
-                    newRec = {"error": tlsa.error}
-                else:
-                    newRec = {
-                        "usage": tlsa.usage.name,
-                        "selector": tlsa.selector.name,
-                        "matchingType": tlsa.matchingType.name,
-                    }
-                    if tlsa.matchesCertificate(serverCertificate):
-                        newRec["matches"] = doesMatch = True
+                newRec = {
+                    "usage": tlsa.usage.name,
+                    "selector": tlsa.selector.name,
+                    "matchingType": tlsa.matchingType.name,
+                    "errors": tlsa.errors,
+                    "valid": tlsa.valid,
+                }
+
+                if tlsa.valid and tlsa.matchesCertificate(serverCertificate):
+                    newRec["matches"] = doesMatch = True
                 recs.append(newRec)
 
             rv = {

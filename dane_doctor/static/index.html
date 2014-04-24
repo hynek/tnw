@@ -94,7 +94,6 @@
 
                 //<!-- sock.send("full.getdnsapi.net"); -->
                 //<!-- sock.send("bad-hash.dane.verisignlabs.com"); -->
-                console.log("helo",$("#parent_domain").val());
                 sock.send($("#parent_domain").val());
                 $('#results').show();
                 $('#resbody').empty();
@@ -103,20 +102,31 @@
                 res = $.parseJSON(e.data);
                 jQuery.each(res.tlsaRecords, function (key, value) {
                     row = $("<tr>");
-                    if (value.error !== undefined) {
-                    row.append($('<td colspan="4">').append($("<span>").addClass("btn btn-xs btn-danger").text(value.error)));
+                    if (value.usage === "INVALID") {
+                        err = value.errors.usage;
+                        row.append($("<td>").addClass("danger").text(err[0][0] + ": " + err[0][1]));
                     } else {
                         row.append($("<td>").text(value.usage));
-                        row.append($("<td>").text(value.selector));
-                        row.append($("<td>").text(value.matchingType));
-                        if (value.matches) {
-                            matches = $("<span>").addClass("btn btn-xs btn-success").text("yes");
-                        } else {
-                            matches = $("<span>").addClass("btn btn-xs btn-danger").text("no");
-                        }
-
-                        row.append($("<td>").append(matches))
                     }
+                    if (value.selector === "INVALID") {
+                        err = value.errors.selector;
+                        row.append($("<td>").addClass("danger").text(err[0][0] + ": " + err[0][1]));
+                    } else {
+                        row.append($("<td>").text(value.selector));
+                    }
+                    if (value.matchingType === "INVALID") {
+                        err = value.errors.matchingType;
+                        row.append($("<td>").addClass("danger").text(err[0][0] + ": " + err[0][1]));
+                    } else {
+                        row.append($("<td>").text(value.matchingType));
+                    }
+
+                    if (value.matches) {
+                        row.append($("<td>").addClass("success").text("yes"));
+                    } else {
+                        row.append($("<td>").addClass("danger").text("no"));
+                    }
+
                     row.appendTo("#resbody");
                 });
             };

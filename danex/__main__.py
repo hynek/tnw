@@ -25,11 +25,14 @@ def printResult(res):
         " (UNTRUSTED)" if numRecs and not trusted else "",
     ))
 
+    hasInvalid = False
     for tlsa in tlsaRecords:
+        if not tlsa.valid:
+            hasInvalid = True
         print(tlsa)
 
     print()
-    if isinstance(tlsa, _dane.InvalidTLSARecord):
+    if hasInvalid:
         print(
             "INVALID TLSA records received."
         )
