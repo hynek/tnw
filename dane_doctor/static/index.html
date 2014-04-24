@@ -100,11 +100,12 @@
                 $('#resbody').empty();
             };
             sock.onmessage = function(e) {
-
-                console.log(e.data);
                 res = $.parseJSON(e.data);
                 jQuery.each(res.tlsaRecords, function (key, value) {
-                        row = $("<tr>");
+                    row = $("<tr>");
+                    if (value.error !== undefined) {
+                    row.append($('<td colspan="4">').append($("<span>").addClass("btn btn-xs btn-danger").text(value.error)));
+                    } else {
                         row.append($("<td>").text(value.usage));
                         row.append($("<td>").text(value.selector));
                         row.append($("<td>").text(value.matchingType));
@@ -115,7 +116,8 @@
                         }
 
                         row.append($("<td>").append(matches))
-                        row.appendTo("#resbody");
+                    }
+                    row.appendTo("#resbody");
                 });
             };
             sock.onclose = function() {

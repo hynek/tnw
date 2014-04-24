@@ -26,6 +26,13 @@ def tlsaDomainName(parentDomain, port, proto):
     return "_{}._{}.{}".format(port, proto, parentDomain)
 
 
+class InvalidTLSARecord(FancyStrMixin, object):
+    showAttributes = ("error",)
+
+    def __init__(self, error):
+        self.error = error
+
+
 class GetdnsResponseError(FancyStrMixin, Exception):
     """
     Raised for any getdns response that isn't GOOD.
@@ -145,12 +152,15 @@ def lookup_tlsa_records(parentDomain, port, proto, getdns=getdns):
             if answer["type"] != getdns.GETDNS_RRTYPE_TLSA:
                 continue
             rdata = answer['rdata']
-            rv.append(TLSARecord(
-                rdata['certificate_association_data'],
-                rdata['certificate_usage'],
-                rdata["selector"],
-                rdata["matching_type"],
-            ))
+            try:
+                rv.append(TLSARecord(
+                    rdata['certificate_association_data'],
+                    rdata['certificate_usage'],
+                    rdata["selector"],
+                    rdata["matching_type"],
+                ))
+            except ValueError as e:
+                rv.append(InvalidTLSARecord(e.args[0]))
         return trusted, rv
 
     raise GetdnsResponseError(results['status'])
