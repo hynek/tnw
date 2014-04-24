@@ -41,6 +41,7 @@ class TLSARecordTests(SynchronousTestCase):
         self.assertEqual(
             True,
             _dane.TLSARecord(
+                trusted=True,
                 payload=serverCertBytes,
                 usage=0,
                 selector=_dane.SELECTOR.CERT.value,

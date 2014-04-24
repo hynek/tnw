@@ -77,9 +77,10 @@ MATCHING_TYPE_MAP = {
 
 
 class TLSARecord(FancyStrMixin, object):
-    showAttributes = ('usage', 'selector', 'matchingType')
+    showAttributes = ('trusted', 'usage', 'selector', 'matchingType')
 
-    def __init__(self, payload, usage, selector, matchingType):
+    def __init__(self, trusted, payload, usage, selector, matchingType):
+        self.trusted = trusted
         self.payload = bytes(payload)
 
         try:
@@ -127,7 +128,7 @@ def lookup_tlsa_records(parentDomain, port, proto, getdns=getdns):
     ctx = getdns.context_create()
     extensions = {
         "return_both_v4_and_v6": getdns.GETDNS_EXTENSION_TRUE,
-        "dnssec_return_only_secure": getdns.GETDNS_EXTENSION_FALSE,
+        "dnssec_return_validation_chain": getdns.GETDNS_EXTENSION_TRUE,
     }
     results = getdns.general(ctx,
                              request_type=getdns.GETDNS_RRTYPE_TLSA,
@@ -136,11 +137,16 @@ def lookup_tlsa_records(parentDomain, port, proto, getdns=getdns):
 
     if results["status"] == getdns.GETDNS_RESPSTATUS_GOOD:
         rv = []
+        trusted = (
+            results['replies_tree'][0]['dnssec_status']
+            == getdns.GETDNS_DNSSEC_SECURE
+        )
         for answer in results['replies_tree'][0]['answer']:
             if answer["type"] != getdns.GETDNS_RRTYPE_TLSA:
                 continue
             rdata = answer['rdata']
             rv.append(TLSARecord(
+                trusted,
                 rdata['certificate_association_data'],
                 3,
                 rdata["selector"],
