@@ -2,6 +2,8 @@
 # See LICENSE for details.
 
 from twisted.trial.unittest import SynchronousTestCase
+from twisted.python.filepath import FilePath
+from OpenSSL import crypto
 import getdns
 from tlsep import _dane
 
@@ -63,18 +65,62 @@ class TLSARecordTests(SynchronousTestCase):
         )
 
 
-    def test_matchesCertificate(self):
+    def test_matchesCertificateCertTrue(self):
         """
         """
+        serverCertBytes = FilePath(__file__).sibling('example_cert.bin').open().read()
+        serverCert = crypto.load_certificate(crypto.FILETYPE_ASN1, serverCertBytes)
         self.assertEqual(
-            "",
+            True,
             _dane.TLSARecord(
-                payload=b'',
+                payload=serverCertBytes,
                 usage=0,
                 selector=_dane.SELECTOR.CERT.value,
                 matchingType=_dane.MATCHING_TYPE.FULL.value
-            ).matchesCertificate()
+            ).matchesCertificate(serverCert)
         )
+
+
+    def test_matchesCertificateCertFalse(self):
+        """
+        """
+        serverCertBytesOriginal = FilePath(__file__).sibling('example_cert.bin').open().read()
+        serverCert = crypto.load_certificate(crypto.FILETYPE_ASN1, serverCertBytesOriginal)
+        originalSerial = serverCert.get_serial_number()
+        serverCert.set_serial_number(100)
+        self.assertNotEqual(originalSerial, serverCert.get_serial_number())
+        serverCertBytesNew = crypto.dump_certificate(crypto.FILETYPE_ASN1, serverCert)
+        self.assertNotEqual(serverCertBytesOriginal, serverCertBytesNew)
+        self.assertEqual(
+            False,
+            _dane.TLSARecord(
+                payload=serverCertBytesNew,
+                usage=0,
+                selector=_dane.SELECTOR.CERT.value,
+                matchingType=_dane.MATCHING_TYPE.FULL.value
+            ).matchesCertificate(serverCert)
+        )
+    test_matchesCertificateCertFalse.skip = True
+
+    def test_matchesCertificateSPKITrue(self):
+        """
+        """
+        serverCertBytesOriginal = FilePath(__file__).sibling('example_cert.bin').open().read()
+        serverCert = crypto.load_certificate(crypto.FILETYPE_ASN1, serverCertBytesOriginal)
+        serverCert.set_serial_number(100)
+        serverCertBytes = crypto.dump_certificate(crypto.FILETYPE_ASN1, serverCert)
+        self.assertEqual(serverCertBytesOriginal, serverCertBytes)
+#        import pdb; pdb.set_trace()
+        self.assertEqual(
+            False,
+            _dane.TLSARecord(
+                payload=serverCertBytes + b'xxx',
+                usage=0,
+                selector=_dane.SELECTOR.SPKI.value,
+                matchingType=_dane.MATCHING_TYPE.FULL.value
+            ).matchesCertificate(serverCert)
+        )
+    test_matchesCertificateSPKITrue.skip = True
 
 
 class FakeGetdns(object):
