@@ -17,10 +17,25 @@ from . import _dane, _tls
 
 
 def printResult(res):
-    tlsaRecords, serverCertificate = res
+    (trusted, tlsaRecords), serverCertificate = res
+    numRecs = len(tlsaRecords)
+    print("{} TLSA record{} found.{}".format(
+        numRecs,
+        "s" if numRecs != 1 else "",
+        " (UNTRUSTED)" if numRecs and not trusted else "",
+    ))
+
     for tlsa in tlsaRecords:
-        print(tlsa.matchesCertificate(serverCertificate))
         print(tlsa)
+
+    print()
+    if tlsa.matchesCertificate(serverCertificate):
+        print(
+            "The server-sent certificate matches at least one of the TLSA "
+            "records."
+        )
+    else:
+        print("The server-sent certificate did NOT match any TLSA record.")
 
 
 def _main(reactor, parent_domain, port, proto):

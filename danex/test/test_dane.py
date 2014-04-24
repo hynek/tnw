@@ -45,7 +45,6 @@ class TLSARecordTests(SynchronousTestCase):
         self.assertEqual(
             True,
             _dane.TLSARecord(
-                trusted=True,
                 payload=serverCertBytes,
                 usage=0,
                 selector=_dane.SELECTOR.CERT.value,
@@ -130,8 +129,8 @@ class TLSATests(SynchronousTestCase):
             generalResult=createResults(status=getdns.GETDNS_RESPSTATUS_GOOD,
                                         selector=_dane.SELECTOR.CERT.value,
                                         certificate_association_data=b'FOOBAR'))
-        res = _dane.lookup_tlsa_records(
-            'example.com', 443, 'tcp', getdns=fakeGetdns)[0]
+        _, (res,) = _dane.lookup_tlsa_records(
+            'example.com', 443, 'tcp', getdns=fakeGetdns)
         self.assertEqual(
             (_dane.SELECTOR.CERT, b'FOOBAR'),
             (res.selector, res.payload)
@@ -148,8 +147,8 @@ class TLSATests(SynchronousTestCase):
             generalResult=createResults(status=getdns.GETDNS_RESPSTATUS_GOOD,
                                         selector=_dane.SELECTOR.SPKI.value,
                                         certificate_association_data=b'FOOBAR'))
-        res = _dane.lookup_tlsa_records(
-            'example.com', 443, 'tcp', getdns=fakeGetdns)[0]
+        _, (res,) = _dane.lookup_tlsa_records(
+            'example.com', 443, 'tcp', getdns=fakeGetdns)
         self.assertEqual(
             (_dane.SELECTOR.SPKI, b'FOOBAR'),
             (res.selector, res.payload)

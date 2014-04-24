@@ -78,10 +78,9 @@ MATCHING_TYPE_MAP = {
 
 
 class TLSARecord(FancyStrMixin, object):
-    showAttributes = ('trusted', 'usage', 'selector', 'matchingType')
+    showAttributes = ('usage', 'selector', 'matchingType')
 
-    def __init__(self, trusted, payload, usage, selector, matchingType):
-        self.trusted = trusted
+    def __init__(self, payload, usage, selector, matchingType):
         self.payload = bytes(payload)
 
         try:
@@ -147,12 +146,11 @@ def lookup_tlsa_records(parentDomain, port, proto, getdns=getdns):
                 continue
             rdata = answer['rdata']
             rv.append(TLSARecord(
-                trusted,
                 rdata['certificate_association_data'],
-                3,
+                rdata['certificate_usage'],
                 rdata["selector"],
                 rdata["matching_type"],
             ))
-        return rv
+        return trusted, rv
 
     raise GetdnsResponseError(results['status'])
