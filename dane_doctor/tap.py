@@ -7,12 +7,15 @@ from twisted.application.internet import StreamServerEndpointService
 from twisted.application.service import MultiService
 from twisted.internet.endpoints import serverFromString
 from twisted.python import usage
+from twisted.internet.protocol import Factory, Protocol, connectionDone
 from twisted.python.filepath import FilePath
 from twisted.web.resource import ForbiddenResource, Resource
 from twisted.web.server import Site
 from twisted.web.static import File
 
 from txsockjs.factory import SockJSResource
+
+from .protocol import DaneDoctorProtocol
 
 
 class Options(usage.Options):
@@ -38,14 +41,15 @@ class DaneDoctorService(MultiService, object):
 
         staticPath = FilePath(__file__).sibling("static")
         root = NoListDirFile(staticPath.path)
-        # root.putChild('api', SockJSResource(DomCheckFactory()))
+        root.putChild('api', SockJSResource(
+            Factory.forProtocol(DaneDoctorProtocol))
+        )
 
         webService = StreamServerEndpointService(
             serverFromString(self._reactor, "tcp:8080"),
             Site(root)
         )
         webService.setServiceParent(self)
-
 
 
 def makeService(options):

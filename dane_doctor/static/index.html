@@ -29,7 +29,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">DANE Doctor</a>
+          <a class="navbar-brand" href="/">DANE Doctor</a>
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
@@ -42,7 +42,11 @@
     <div class="container">
       <div class="starter-template">
         <h1>The DANE Doctor is in!</h1>
+        <p class="lead">Check out <a href="http://dane.verisignlabs.com/">these</a> examples!</p>
       </div>
+
+      <!-- <form action="" method="post"> -->
+      <!-- </form> -->
       <div>
         <form role="form">
           <div class="form-group">
@@ -52,6 +56,18 @@
           <button type="submit" class="btn btn-default">Run Diagnostic</button>
         </form>
 
+      </div>
+
+      <div id="results" class="panel panel-default">
+          <div class="panel-heading">Your results:</div>
+          <table class="table">
+              <tr>
+                  <th>Usage</th>
+                  <th>Selector</th>
+                  <th>Matching type</th>
+                  <th>Matches server certificate</th>
+              </tr>
+          </table>
       </div>
     </div>
 
@@ -72,5 +88,41 @@
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
     <script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
+     <script charset="utf-8">
+        var sock = new SockJS('http://localhost:8080/api');
+        sock.onopen = function() {
+            console.log('open');
+
+            <!-- sock.send("full.getdnsapi.net"); -->
+            sock.send("bad-hash.dane.verisignlabs.com");
+            $('#results').show();
+        };
+        sock.onmessage = function(e) {
+
+            console.log(e.data);
+            res = $.parseJSON(e.data);
+            jQuery.each(res.tlsaRecords, function (key, value) {
+                    row = $("<tr>");
+                    row.append($("<td>").text(value.usage));
+                    row.append($("<td>").text(value.selector));
+                    row.append($("<td>").text(value.matchingType));
+                    if (value.matches) {
+                        matches = $("<span>").addClass("btn btn-xs btn-success").text("yes");
+                    } else {
+                        matches = $("<span>").addClass("btn btn-xs btn-danger").text("no");
+                    }
+
+                    row.append($("<td>").append(matches))
+                    row.appendTo("#results .table");
+            });
+
+            <!-- $('<tr><td>' + e.data + '</td>td</tr>').appendTo("#results"); -->
+            <!-- $('<li>' + e.data + '</li>').appendTo("#messages"); -->
+        };
+        sock.onclose = function() {
+            console.log('close');
+        };
+    </script>
+
   </body>
 </html>

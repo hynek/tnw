@@ -38,3 +38,7 @@ body {
 #footer .sponsor img {
     height: 60px;
 }
+
+#results {
+    display: none;
+}
