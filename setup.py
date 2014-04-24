@@ -18,6 +18,7 @@ setup(
     install_requires=[
         'getdns',
         'idna',
+        'pyopenssl',
         'twisted',
         "txsockjs",
     ],
