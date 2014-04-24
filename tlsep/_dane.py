@@ -117,8 +117,8 @@ def lookup_tlsa_records(parentDomain, port, proto, getdns=getdns):
     @param proto: The IP protocol with which the TLSA record is associated.
     @param getdns: An optional getdnsapi object. For testing purposes.
 
-    @returns: A TLSA record instance corresponding to the selector type of the
-        record.
+    @returns: A list of TLSA record instances corresponding to the selector
+        type of the record.
     """
     ctx = getdns.context_create()
     extensions = {
@@ -131,12 +131,17 @@ def lookup_tlsa_records(parentDomain, port, proto, getdns=getdns):
                              extensions=extensions)
 
     if results["status"] == getdns.GETDNS_RESPSTATUS_GOOD:
-        rdata = results['replies_tree'][0]['answer'][0]['rdata']
-        return TLSARecord(
-            rdata['certificate_association_data'],
-            3,
-            rdata["selector"],
-            rdata["matching_type"],
-        )
+        rv = []
+        for answer in results['replies_tree'][0]['answer']:
+            if answer["type"] != getdns.GETDNS_RRTYPE_TLSA:
+                continue
+            rdata = answer['rdata']
+            rv.append(TLSARecord(
+                rdata['certificate_association_data'],
+                3,
+                rdata["selector"],
+                rdata["matching_type"],
+            ))
+        return rv
 
     raise GetdnsResponseError(results['status'])
