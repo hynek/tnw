@@ -19,5 +19,6 @@ setup(
         'getdns',
         'idna',
         'twisted',
+        "txsockjs",
     ],
 )
