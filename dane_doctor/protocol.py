@@ -3,7 +3,6 @@ from __future__ import (absolute_import, division, print_function)
 import json
 
 from twisted.internet.protocol import Factory, Protocol, connectionDone
-
 from twisted.internet import task, threads, defer
 
 from danex import _dane, _tls

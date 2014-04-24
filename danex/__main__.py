@@ -29,7 +29,11 @@ def printResult(res):
         print(tlsa)
 
     print()
-    if tlsa.matchesCertificate(serverCertificate):
+    if isinstance(tlsa, _dane.InvalidTLSARecord):
+        print(
+            "INVALID TLSA records received."
+        )
+    elif tlsa.matchesCertificate(serverCertificate):
         print(
             "The server-sent certificate matches at least one of the TLSA "
             "records."
