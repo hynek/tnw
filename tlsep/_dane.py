@@ -82,17 +82,21 @@ class TLSARecord(FancyStrMixin, object):
     def __init__(self, payload, usage, selector, matchingType):
         self.payload = bytes(payload)
 
-        self.usage = USAGE.lookupByValue(usage)
-        self.selector = SELECTOR.lookupByValue(selector)
-        self.matchingType = MATCHING_TYPE.lookupByValue(matchingType)
-
-        self._select = SELECTOR_MAP.get(self.selector)
-        if self._select is None:
+        try:
+            self.usage = USAGE.lookupByValue(usage)
+        except ValueError:
+            raise ValueError("Invalid usage: {}".format(usage))
+        try:
+            self.selector = SELECTOR.lookupByValue(selector)
+        except ValueError:
             raise ValueError("Invalid selector: {}".format(selector))
-
-        self._transform = MATCHING_TYPE_MAP.get(self.matchingType)
-        if self._transform is None:
+        try:
+            self.matchingType = MATCHING_TYPE.lookupByValue(matchingType)
+        except ValueError:
             raise ValueError("Invalid matching type: {}".format(matchingType))
+
+        self._select = SELECTOR_MAP[self.selector]
+        self._transform = MATCHING_TYPE_MAP[self.matchingType]
 
 
     def matchesCertificate(self, cert):
