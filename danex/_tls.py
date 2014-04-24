@@ -1,4 +1,4 @@
-# -*- test-case-name: tlsep.test.test_tls -*-
+# -*- test-case-name: danex.test.test_tls -*-
 # Copyright (c) Hynek Schlawack, Richard Wall
 # See LICENSE for details.
 

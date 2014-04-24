@@ -1,3 +1,6 @@
+# Copyright (c) Hynek Schlawack, Richard Wall
+# See LICENSE for details.
+
 from __future__ import absolute_import, division, print_function
 
 import hashlib
@@ -5,7 +8,7 @@ import hashlib
 from OpenSSL import crypto
 from twisted.trial.unittest import SynchronousTestCase
 
-from tlsep._x509 import extractPublicKey
+from danex._x509 import extractPublicKey
 
 
 class TestX509(SynchronousTestCase):

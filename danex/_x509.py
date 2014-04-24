@@ -1,4 +1,4 @@
-# -*- test-case-name: tlsep.test.test_x509 -*-
+# -*- test-case-name: danex.test.test_x509 -*-
 # Copyright (c) Hynek Schlawack, Richard Wall
 # See LICENSE for details.
 

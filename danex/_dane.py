@@ -1,17 +1,18 @@
-# -*- test-case-name: tlsep.test.test_dane -*-
+# -*- test-case-name: danex.test.test_dane -*-
 # Copyright (c) Hynek Schlawack, Richard Wall
 # See LICENSE for details.
 
+from __future__ import absolute_import, division, print_function
+
 import hashlib
+
 import getdns
 
-
 from OpenSSL import crypto
-
 from twisted.python.constants import ValueConstant, Values
 from twisted.python.util import FancyStrMixin
 
-from tlsep._x509 import extractPublicKey
+from ._x509 import extractPublicKey
 
 
 def tlsaDomainName(parentDomain, port, proto):

@@ -4,16 +4,16 @@ from setuptools import setup
 
 
 setup(
-    name='tlsep',
+    name='dane_doctor',
     version='0.1',
     classifiers=["Private :: Do Not Upload"],
     entry_points={
         'console_scripts': [
-            'tlsep = tlsep.__main__:main',
+            'danex = danex.__main__:main',
         ]
     },
     packages=[
-        'tlsep',
+        'danex',
     ],
     install_requires=[
         'getdns',

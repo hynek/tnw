@@ -1,11 +1,15 @@
 # Copyright (c) Hynek Schlawack, Richard Wall
 # See LICENSE for details.
 
+from __future__ import absolute_import, division, print_function
+
+import getdns
+
 from twisted.trial.unittest import SynchronousTestCase
 from twisted.python.filepath import FilePath
 from OpenSSL import crypto
-import getdns
-from tlsep import _dane
+
+from danex import _dane
 
 
 class TLSADomainNameTests(SynchronousTestCase):

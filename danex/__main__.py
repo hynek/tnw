@@ -1,4 +1,4 @@
-# -*- test-case-name: tlsep.test.test_scripts -*-
+# -*- test-case-name: danex.test.test_scripts -*-
 # Copyright (c) Hynek Schlawack, Richard Wall
 # See LICENSE for details.
 
@@ -6,14 +6,14 @@ from __future__ import absolute_import, division, print_function
 
 
 """
-eg tlsep full.cert.getdnsapi.net 443 tcp
+eg danex full.cert.getdnsapi.net 443 tcp
 """
 
 import sys
 
 from twisted.internet import task, threads, defer
 
-from tlsep import _dane, _tls
+from . import _dane, _tls
 
 
 def printResult(res):
