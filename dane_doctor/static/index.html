@@ -45,15 +45,11 @@
         <p class="lead">Check out <a href="http://dane.verisignlabs.com/">these</a> examples!</p>
       </div>
 
-      <!-- <form action="" method="post"> -->
-      <!-- </form> -->
       <div>
-        <form role="form">
+        <form role="form" id="domain">
           <div class="form-group">
-            <label for="parent_domain">Domain Name</label>
             <input type="text" class="form-control" id="parent_domain" placeholder="Domain Name">
           </div>
-          <button type="submit" class="btn btn-default">Run Diagnostic</button>
         </form>
 
       </div>
@@ -67,6 +63,7 @@
                   <th>Matching type</th>
                   <th>Matches server certificate</th>
               </tr>
+              <tbody id="resbody"></tbody>
           </table>
       </div>
     </div>
@@ -89,39 +86,44 @@
 
     <script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
      <script charset="utf-8">
-        var sock = new SockJS('http://localhost:8080/api');
-        sock.onopen = function() {
-            console.log('open');
+         $("#domain").submit(
+        function(e) {
+            var sock = new SockJS('http://localhost:8080/api');
+            sock.onopen = function() {
+                console.log('open');
 
-            <!-- sock.send("full.getdnsapi.net"); -->
-            sock.send("bad-hash.dane.verisignlabs.com");
-            $('#results').show();
-        };
-        sock.onmessage = function(e) {
+                //<!-- sock.send("full.getdnsapi.net"); -->
+                //<!-- sock.send("bad-hash.dane.verisignlabs.com"); -->
+                console.log("helo",$("#parent_domain").val());
+                sock.send($("#parent_domain").val());
+                $('#results').show();
+                $('#resbody').empty();
+            };
+            sock.onmessage = function(e) {
 
-            console.log(e.data);
-            res = $.parseJSON(e.data);
-            jQuery.each(res.tlsaRecords, function (key, value) {
-                    row = $("<tr>");
-                    row.append($("<td>").text(value.usage));
-                    row.append($("<td>").text(value.selector));
-                    row.append($("<td>").text(value.matchingType));
-                    if (value.matches) {
-                        matches = $("<span>").addClass("btn btn-xs btn-success").text("yes");
-                    } else {
-                        matches = $("<span>").addClass("btn btn-xs btn-danger").text("no");
-                    }
+                console.log(e.data);
+                res = $.parseJSON(e.data);
+                jQuery.each(res.tlsaRecords, function (key, value) {
+                        row = $("<tr>");
+                        row.append($("<td>").text(value.usage));
+                        row.append($("<td>").text(value.selector));
+                        row.append($("<td>").text(value.matchingType));
+                        if (value.matches) {
+                            matches = $("<span>").addClass("btn btn-xs btn-success").text("yes");
+                        } else {
+                            matches = $("<span>").addClass("btn btn-xs btn-danger").text("no");
+                        }
 
-                    row.append($("<td>").append(matches))
-                    row.appendTo("#results .table");
-            });
+                        row.append($("<td>").append(matches))
+                        row.appendTo("#resbody");
+                });
+            };
+            sock.onclose = function() {
+                console.log('close');
+            };
 
-            <!-- $('<tr><td>' + e.data + '</td>td</tr>').appendTo("#results"); -->
-            <!-- $('<li>' + e.data + '</li>').appendTo("#messages"); -->
-        };
-        sock.onclose = function() {
-            console.log('close');
-        };
+            return false;
+    });
     </script>
 
   </body>
